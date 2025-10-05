@@ -1,16 +1,20 @@
 import { test, expect } from "@playwright/test";
+import { randomState } from "@helpers/states";
 
 test.describe("Checkout challenge", async () => {
   test.use({ storageState: ".auth/customer01.json" });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto("https://practicesoftwaretesting.com");
+    await page.goto("/");
   });
 
-  test("buy now pay later", async ({ page, headless }) => {
+  test("buy now pay later", async ({ page, headless, isMobile }) => {
     await page.getByText("Claw Hammer with Shock Reduction Grip").click();
     await page.getByTestId("add-to-cart").click();
     await expect(page.getByTestId("cart-quantity")).toHaveText("1");
+    if (isMobile === true) {
+      await page.getByLabel("Toggle navigation").click();
+    }
     await page.getByTestId("nav-cart").click();
     await page.getByTestId("proceed-1").click();
     await page.getByTestId("proceed-2").click();
@@ -19,7 +23,7 @@ test.describe("Checkout challenge", async () => {
     ).toHaveCSS("background-color", "rgb(51, 153, 51)");
     await page.getByTestId("street").fill("123 Testing Way");
     await page.getByTestId("city").fill("Sacramento");
-    await page.getByTestId("state").fill("California");
+    await page.getByTestId("state").fill(randomState());
     await page.getByTestId("country").fill("USA");
     await page.getByTestId("postal_code").fill("98765");
     await page.getByTestId("proceed-3").click();
